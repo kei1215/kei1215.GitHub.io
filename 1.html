@@ -1,8 +1,51 @@
-<!DOCTYPE html>
-<html>
-  <head>
-  <title>kei1215について</title>
-  </head>
-  <body>
-  </body>
-</html>
+<head>
+ 	<meta charset="UTF-8">
+ 	<title>アンケート</title>
+ 	<style type="text/css">
+ 	input[type="text"] {
+ 		width: 200px;
+ 		height: 20px;
+ 		font-size: 14px;
+ 		margin-bottom: 10px;
+ 	}
+ 	input[type="radio"] {
+ 		margin-bottom: 10px;
+ 	}
+ 	button {
+ 		width: 200px;
+ 		height: 40px;
+ 		font-size: 14px;
+ 		background-color: #00baaf;
+ 		color: #fff;
+ 		text-align: center;
+ 		margin-top: 20px;
+ 	}
+ 	label{
+   display:block;
+   position:relative;
+ 	line-height: 30px;
+ 	}
+ 	h1 {
+ 		font-size: 22px;
+ 	  padding: 15px;;
+ 	  border-left: 6px solid #00baaf;
+ 		margin-bottom: 30px;
+ 	}
+ 	</style>
+ </head>
+
+ <body>
+ 	<h1>どちらが食べたいですか？</h1>
+ 	<form method="post" action="/enquetes/yaki-shabu">
+ 		<input type="radio" name="yaki-shabu" value="焼き肉" /> 焼き肉
+ 		<input type="radio" name="yaki-shabu" value="しゃぶしゃぶ" /> しゃぶしゃぶ
+ 		名前: <input type="text" name="name" placeholder="名前を入力してください">
+ 		<label><input type="radio" name="yaki-shabu" value="焼き肉" /> 焼き肉</label>
+ 		<label><input type="radio" name="yaki-shabu" value="しゃぶしゃぶ" /> しゃぶしゃぶ
+ 		<label><input type="radio" name="yaki-shabu" value="ユッケ" /> ユッケ</label>
+ </label>
+ 		<button type="submit">投稿</button>
+ 	</form>
+ </body>
+
+ </html> 
