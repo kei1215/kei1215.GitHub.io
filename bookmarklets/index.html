@@ -11,15 +11,15 @@
   </style>
 </head>
 <body>
-  <h1>OFFLINE QP Rotation Bookmarklet v4.8204</h1>
+  <h1>OFFLINE QP Rotation Bookmarklet v4.8206</h1>
   <p>Drag the button below to the bookmarks bar. Start OFFLINE QP, then click the bookmark to toggle a 180-degree board rotation.</p>
   <p><a id="install" class="button" href="#">Loading bookmarklet...</a></p>
-  <p>The bookmarklet refuses online play and non-QP boards. It requires <code>tetrio-patch vO4.8204</code> or <code>vA4.8204</code>.</p>
+  <p>The bookmarklet refuses online play and non-QP boards. It requires <code>tetrio-patch vO4.8206</code> or <code>vA4.8206</code>.</p>
   <script>
-    fetch('./tetrio-offline-qp-v4.8204.txt').then(response => response.text()).then(code => {
+    fetch('./tetrio-offline-qp-v4.8206.txt').then(response => response.text()).then(code => {
       const link = document.getElementById('install');
       link.href = code.trim();
-      link.textContent = 'OFFLINE QP Rotate v4.8204';
+      link.textContent = 'OFFLINE QP Rotate v4.8206';
     }).catch(() => { document.getElementById('install').textContent = 'Bookmarklet failed to load'; });
   </script>
 </body>
