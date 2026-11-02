@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>tetrio-patch OFFLINE QP Bookmarklet</title>
+  <style>
+    body { max-width: 760px; margin: 48px auto; padding: 0 20px; color: #eaf2ff; background: #0c111b; font: 16px/1.6 system-ui; }
+    a.button { display: inline-block; padding: 12px 18px; border-radius: 8px; color: #07101c; background: #8fc8ff; font-weight: 800; text-decoration: none; }
+    code { color: #b9dcff; }
+  </style>
+</head>
+<body>
+  <h1>OFFLINE QP Rotation Bookmarklet v4.8201</h1>
+  <p>Drag the button below to the bookmarks bar. Start OFFLINE QP, then click the bookmark to toggle a 180-degree board rotation.</p>
+  <p><a id="install" class="button" href="#">Loading bookmarklet...</a></p>
+  <p>The bookmarklet refuses online play and non-QP boards. It requires <code>tetrio-patch vO4.8201</code> or <code>vA4.8201</code>.</p>
+  <script>
+    fetch('./tetrio-offline-qp-v4.8201.txt').then(response => response.text()).then(code => {
+      const link = document.getElementById('install');
+      link.href = code.trim();
+      link.textContent = 'OFFLINE QP Rotate v4.8201';
+    }).catch(() => { document.getElementById('install').textContent = 'Bookmarklet failed to load'; });
+  </script>
+</body>
+</html>
