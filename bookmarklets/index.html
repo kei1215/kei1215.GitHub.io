@@ -14,13 +14,13 @@
   </style>
 </head>
 <body>
-  <h1>TETR.IO Standalone OFFLINE v4.8214</h1>
+  <h1>TETR.IO Standalone OFFLINE v4.8216</h1>
   <p>下のボタンをブックマークバーへドラッグしてください。<code>https://tetr.io/</code> を開いてボタンを押すと、別タブにOFFLINEを起動します。</p>
   <p><a id="install" class="button" href="#">Loading bookmarklet...</a></p>
   <button id="copy" type="button">ブックマークコードをコピー</button>
   <p id="copy-status" aria-live="polite"></p>
   <p class="note">追加パッチやTampermonkeyは不要です。QP、ZEN、ローカル／オンラインリプレイ、端末内保存、OFFLINE盤面回転を利用できます。通常のオンライン対戦・ルーム・観戦は起動しません。</p>
-  <p>localhostは使用していません。<code>blob:https://tetr.io/…</code> の一時ページで動きます。起動時だけ公式TETR.IOの画面素材と本体を読み込み、プレイはOFFLINE内で行います。</p>
+  <p>localhostは使用していません。<code>blob:https://tetr.io/…</code> の一時ページで動きます。OFFLINE用の接続先はGitHubリポジトリで、起動時だけ公式TETR.IOの画面素材と本体を読み込み、プレイはOFFLINE内で行います。</p>
   <section>
     <h2>iPhone／iPad（Safari）</h2>
     <ol>
@@ -45,11 +45,11 @@
   </section>
   <script>
     let bookmarkCode='';
-    fetch('./tetrio-offline-standalone-v4.8214.txt').then(response => response.text()).then(code => {
+    fetch('./tetrio-offline-standalone-v4.8216.txt').then(response => response.text()).then(code => {
       bookmarkCode=code.trim();
       const link = document.getElementById('install');
       link.href = bookmarkCode;
-      link.textContent = 'OFFLINEを起動 v4.8214';
+      link.textContent = 'OFFLINEを起動 v4.8216';
       document.getElementById('manual').value=bookmarkCode;
     }).catch(() => { document.getElementById('install').textContent = 'Bookmarklet failed to load'; });
     document.getElementById('copy').onclick=async()=>{
