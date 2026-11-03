@@ -3,23 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>tetrio-patch OFFLINE QP Bookmarklet</title>
+  <title>tetrio-patch Standalone OFFLINE Bookmarklet</title>
   <style>
     body { max-width: 760px; margin: 48px auto; padding: 0 20px; color: #eaf2ff; background: #0c111b; font: 16px/1.6 system-ui; }
     a.button { display: inline-block; padding: 12px 18px; border-radius: 8px; color: #07101c; background: #8fc8ff; font-weight: 800; text-decoration: none; }
     code { color: #b9dcff; }
+    .note { padding: 14px 16px; border-left: 4px solid #8fc8ff; background: #141d2b; }
   </style>
 </head>
 <body>
-  <h1>OFFLINE QP Rotation Bookmarklet v4.8212</h1>
-  <p>Drag the button below to the bookmarks bar. Start OFFLINE QP, then click the bookmark to toggle a 180-degree board rotation.</p>
+  <h1>TETR.IO Standalone OFFLINE v4.8213</h1>
+  <p>下のボタンをブックマークバーへドラッグしてください。<code>https://tetr.io/</code> を開いてボタンを押すと、別タブにOFFLINEを起動します。</p>
   <p><a id="install" class="button" href="#">Loading bookmarklet...</a></p>
-  <p>The bookmarklet refuses online play and non-QP boards. It requires <code>tetrio-patch vO4.8212</code> or <code>vA4.8212</code>.</p>
+  <p class="note">追加パッチやTampermonkeyは不要です。QP、ZEN、リプレイ、端末内保存を利用できます。盤面回転、<code>/rotate</code>、<code>/rotato</code>、回転ペナルティは搭載していません。</p>
+  <p>起動時だけ公式TETR.IOの画面素材と本体を読み込みます。対戦サーバーには接続せず、プレイはOFFLINE内で行います。</p>
   <script>
-    fetch('./tetrio-offline-qp-v4.8212.txt').then(response => response.text()).then(code => {
+    fetch('./tetrio-offline-standalone-v4.8213.txt').then(response => response.text()).then(code => {
       const link = document.getElementById('install');
       link.href = code.trim();
-      link.textContent = 'OFFLINE QP Rotate v4.8212';
+      link.textContent = 'OFFLINEを起動 v4.8213';
     }).catch(() => { document.getElementById('install').textContent = 'Bookmarklet failed to load'; });
   </script>
 </body>
