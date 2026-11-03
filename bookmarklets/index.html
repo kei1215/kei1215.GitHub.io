@@ -6,23 +6,57 @@
   <title>tetrio-patch Standalone OFFLINE Bookmarklet</title>
   <style>
     body { max-width: 760px; margin: 48px auto; padding: 0 20px; color: #eaf2ff; background: #0c111b; font: 16px/1.6 system-ui; }
-    a.button { display: inline-block; padding: 12px 18px; border-radius: 8px; color: #07101c; background: #8fc8ff; font-weight: 800; text-decoration: none; }
+    a.button, button { display: inline-block; padding: 12px 18px; border:0; border-radius: 8px; color: #07101c; background: #8fc8ff; font:800 1em system-ui; text-decoration: none; cursor:pointer; }
     code { color: #b9dcff; }
     .note { padding: 14px 16px; border-left: 4px solid #8fc8ff; background: #141d2b; }
+    section { margin: 28px 0; padding-top: 8px; border-top: 1px solid #283850; }
+    textarea { width:100%; min-height:110px; box-sizing:border-box; color:#dcebff; background:#080c13; border:1px solid #405979; }
   </style>
 </head>
 <body>
-  <h1>TETR.IO Standalone OFFLINE v4.8213</h1>
+  <h1>TETR.IO Standalone OFFLINE v4.8214</h1>
   <p>下のボタンをブックマークバーへドラッグしてください。<code>https://tetr.io/</code> を開いてボタンを押すと、別タブにOFFLINEを起動します。</p>
   <p><a id="install" class="button" href="#">Loading bookmarklet...</a></p>
-  <p class="note">追加パッチやTampermonkeyは不要です。QP、ZEN、リプレイ、端末内保存を利用できます。盤面回転、<code>/rotate</code>、<code>/rotato</code>、回転ペナルティは搭載していません。</p>
-  <p>起動時だけ公式TETR.IOの画面素材と本体を読み込みます。対戦サーバーには接続せず、プレイはOFFLINE内で行います。</p>
+  <button id="copy" type="button">ブックマークコードをコピー</button>
+  <p id="copy-status" aria-live="polite"></p>
+  <p class="note">追加パッチやTampermonkeyは不要です。QP、ZEN、ローカル／オンラインリプレイ、端末内保存、OFFLINE盤面回転を利用できます。通常のオンライン対戦・ルーム・観戦は起動しません。</p>
+  <p>localhostは使用していません。<code>blob:https://tetr.io/…</code> の一時ページで動きます。起動時だけ公式TETR.IOの画面素材と本体を読み込み、プレイはOFFLINE内で行います。</p>
+  <section>
+    <h2>iPhone／iPad（Safari）</h2>
+    <ol>
+      <li>このページを普通のブックマークとして一度保存します。</li>
+      <li>上の「ブックマークコードをコピー」を押します。</li>
+      <li>Safariのブックマーク編集を開き、保存したブックマークのURLを全削除してコードを貼り付けます。</li>
+      <li><code>https://tetr.io/</code>を開き、ブックマーク一覧から実行します。</li>
+    </ol>
+    <p>iOS版ChromeよりSafariを推奨します。ポップアップが止められた場合はTETR.IOのポップアップを許可してください。</p>
+  </section>
+  <section>
+    <h2>Android（Chrome）</h2>
+    <ol>
+      <li>このページをブックマークし、名前を「TETR.IO OFFLINE」に変更します。</li>
+      <li>コードをコピーし、ブックマーク編集画面のURLへ貼り付けて保存します。</li>
+      <li><code>https://tetr.io/</code>を開き、アドレスバーへ「TETR.IO OFFLINE」と入力して、候補に出るブックマークを選びます。</li>
+    </ol>
+  </section>
+  <section>
+    <h2>手動コピー用</h2>
+    <textarea id="manual" readonly>Loading…</textarea>
+  </section>
   <script>
-    fetch('./tetrio-offline-standalone-v4.8213.txt').then(response => response.text()).then(code => {
+    let bookmarkCode='';
+    fetch('./tetrio-offline-standalone-v4.8214.txt').then(response => response.text()).then(code => {
+      bookmarkCode=code.trim();
       const link = document.getElementById('install');
-      link.href = code.trim();
-      link.textContent = 'OFFLINEを起動 v4.8213';
+      link.href = bookmarkCode;
+      link.textContent = 'OFFLINEを起動 v4.8214';
+      document.getElementById('manual').value=bookmarkCode;
     }).catch(() => { document.getElementById('install').textContent = 'Bookmarklet failed to load'; });
+    document.getElementById('copy').onclick=async()=>{
+      const status=document.getElementById('copy-status');
+      try{if(!bookmarkCode)throw Error('コードを読み込み中です');await navigator.clipboard.writeText(bookmarkCode);status.textContent='コピーしました';}
+      catch(error){document.getElementById('manual').select();status.textContent='自動コピーできませんでした。下の欄を長押ししてコピーしてください。';}
+    };
   </script>
 </body>
 </html>

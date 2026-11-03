@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>QP 復活ミッションエディタ — v5.3 QP共通条件・基本タブ統合</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f4f8;--card:#fff;--tx:#20212a;--sub:#5e6273;--border:#d5d6df;--accent:#5647cf;--on:#fff;--soft:#ecebfb;--error:#b73439}
+@media(prefers-color-scheme:dark){:root{--bg:#14141b;--card:#20212c;--tx:#eeeef3;--sub:#b0b0c2;--border:#44445b;--accent:#9588ff;--on:#14141b;--soft:#2c2b4a;--error:#ff9298}}
+*{box-sizing:border-box}body{margin:0;color:var(--tx);background:var(--bg);font:14px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+button,select,input,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px}button{cursor:pointer}button:hover{border-color:var(--accent)}
+.primary{background:var(--accent);color:var(--on);border-color:var(--accent);font-weight:600}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--card);border-bottom:1px solid var(--border)}
+h1{font-size:17px;margin:0 auto 0 0}h3{margin:0 0 8px;font-size:14px}small,.help{color:var(--sub);font-size:12px;display:block}
+.menu{position:relative}.menu summary{list-style:none;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:8px}.menu>div{position:absolute;right:0;top:110%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:grid;gap:6px;min-width:220px;z-index:6}
+main{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:14px;padding:14px 20px;align-items:start}
+aside{position:sticky;top:64px;display:grid;gap:10px}.card,.box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}.box{margin-bottom:12px}
+.list{display:grid;gap:6px;max-height:calc(100vh - 330px);min-height:160px;overflow:auto;margin-top:8px}
+.mission{display:flex;gap:9px;align-items:center;text-align:left;width:100%}.mission[aria-selected=true]{outline:2px solid var(--accent);background:var(--soft)}.mission b{display:block;overflow-wrap:anywhere}
+.rank{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:6px;font-weight:700;font-size:12px;color:#fff;background:#7b7f91}
+[data-r=E]{background:#2f8f5b}[data-r=D]{background:#2f78c4}[data-r=C]{background:#7a4fd0}[data-r=B]{background:#c7771c}[data-r=A]{background:#c23b45}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}.chip{border-radius:99px;padding:4px 11px;font-size:13px}.chip[aria-pressed=true],.seg button[aria-pressed=true]{background:var(--accent);color:var(--on);border-color:var(--accent)}
+.tabs{display:flex;gap:4px;overflow:auto;margin:10px 0 12px;border-bottom:1px solid var(--border)}.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;white-space:nowrap}.tabs button[aria-selected=true]{border-color:var(--accent);font-weight:700}
+.top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.top h2{font-size:18px;margin:0;flex:1;min-width:0;overflow-wrap:anywhere}
+.fld{display:grid;gap:3px;margin-bottom:10px;font-size:12px;color:var(--sub)}.fld input,.fld select{width:100%;font-size:14px;color:var(--tx)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}.seg{display:flex;gap:4px}.seg button{flex:1}
+.sw{display:flex;gap:9px;align-items:flex-start;padding:7px 0;cursor:pointer}.sw input{margin-top:3px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.ap{display:grid;grid-template-columns:150px 150px 1fr 1fr;gap:6px 10px;align-items:end;padding:8px 0;border-top:1px solid var(--border)}.ap .fld{margin:0}.ap b{align-self:center}
+.strip{display:flex;gap:6px;margin:8px 0}.nx{flex:1;padding:10px 0;text-align:center}.nx[aria-pressed=true]{background:repeating-linear-gradient(45deg,var(--soft),var(--soft) 6px,var(--card) 6px,var(--card) 12px);color:var(--sub);text-decoration:line-through}.nx:disabled{opacity:.35}
+textarea{width:100%;height:200px;font:12px/1.4 ui-monospace,Menlo,monospace}details>summary{cursor:pointer;color:var(--sub)}
+#status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 14px;border-radius:10px;display:none;z-index:20;max-width:92vw}#status.show{display:block}#status.error{background:var(--error);color:#fff}#status button{margin-left:8px;padding:2px 9px}
+dialog{width:min(560px,94vw);border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--tx);padding:14px}dialog::backdrop{background:#0008}#tplList{display:grid;gap:5px;max-height:60vh;overflow:auto;margin-top:8px}
+#drop{position:fixed;inset:0;background:#5647cf99;color:#fff;display:none;place-items:center;font-size:22px;z-index:30}#drop.on{display:grid}
+@media(max-width:820px){main{display:block;padding:10px}aside{position:static;margin-bottom:12px}.list{max-height:34vh}.ap{grid-template-columns:1fr 1fr}.ap b{grid-column:1/-1}header{padding:8px 10px}}
+</style>
+</head><body>
+<header><h1>QP 復活ミッションエディタ</h1>
+<button id="add">＋ 新規</button><button id="chooseFile">開く</button><button id="download" class="primary">保存</button>
+<details class="menu"><summary>⋯ その他</summary><div>
+<label class="fld">ミッション名の表示言語<select id="nameView"><option value="ja">日本語</option><option value="original">英語の原文</option></select></label>
+<button id="copy">JSONをコピー</button><button id="random">🎲 ランダムに1件作る</button></div></details>
+<input type="file" accept=".json,.txt,application/json,text/plain" hidden id="file"></header>
+<main>
+<aside>
+ <div class="card"><input id="q" type="search" placeholder="🔍 ミッションを検索" style="width:100%"><div class="chips" id="filters"></div><label class="fld">並び順（表示のみ）<select id="listOrder"><option value="rank">難易度・名前</option><option value="mod">MOD別</option><option value="original">保存順</option></select></label><div id="list" class="list"></div>
+ <div class="chips"><button id="addTpl" class="primary" style="flex:1">公式ミッションから追加</button></div></div>
+ <details class="card"><summary>復活テスト：1～3番目を固定</summary><p class="help">未指定ならランダム。復活開始時にここで選んだミッションが優先されます。</p><div id="testSequence"></div></details>
+</aside>
+<section><div class="card" id="editor"></div>
+ <details class="card" style="margin-top:12px"><summary>JSON（上級者向け）— 保存・開くで足りるので通常は不要です</summary><textarea id="json" spellcheck="false"></textarea><div class="chips"><button id="loadText">テキストから読み込む</button></div></details>
+ <p class="help">ゲームには組み込まない独立ページです。保存したJSONをゲーム側で読み込んでください。JSON / TXTファイルはこのページにドラッグ＆ドロップでも開けます。編集内容はこのブラウザに自動で一時保存されます。</p></section>
+</main>
+<dialog id="tpl"><div class="top"><h2>公式ミッションから追加</h2><button id="tplClose">✕</button></div><input id="tplQ" type="search" placeholder="検索（例：スピン、コンボ、E）" style="width:100%;margin-top:8px"><div id="tplList"></div></dialog>
+<div id="status" role="status" aria-live="polite"></div><div id="drop">JSONをここにドロップして開く</div>
+<script>
+'use strict';
+const OFFICIAL=[
+  {
+    "id": "combo",
+    "label": "Perform a 3-Combo",
+    "rank": "F",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "double",
+    "label": "Clear 2 Doubles",
+    "rank": "F",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "quad",
+    "label": "Clear a Quad",
+    "rank": "F",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "lines",
+    "label": "Clear 6 Lines",
+    "rank": "F",
+    "target": 6,
+    "exclude": ""
+  },
+  {
+    "id": "osingle",
+    "label": "Clear a Single using an O-Piece",
+    "rank": "F",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "odouble",
+    "label": "Clear a Double using an O-Piece",
+    "rank": "F",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "szdouble",
+    "label": "Clear a Double using an S or Z-Piece",
+    "rank": "F",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "ljtriple",
+    "label": "Clear a Triple using an L or J-Piece",
+    "rank": "F",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "iholdlines",
+    "label": "Clear 3 lines while holding an I-Piece",
+    "rank": "F",
+    "target": 3,
+    "exclude": "nohold"
+  },
+  {
+    "id": "hold",
+    "label": "Use Hold 8 times",
+    "rank": "F",
+    "target": 8,
+    "exclude": "nohold"
+  },
+  {
+    "id": "rotate",
+    "label": "Rotate 20 times",
+    "rank": "F",
+    "target": 20,
+    "exclude": ""
+  },
+  {
+    "id": "singleconsecutive",
+    "label": "Clear 2 Singles in a row",
+    "rank": "F",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "spin",
+    "label": "Perform any Spin",
+    "rank": "E",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "tspinsingle",
+    "label": "Clear a T-Spin Single",
+    "rank": "E",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "tspindouble",
+    "label": "Clear a T-Spin Double",
+    "rank": "E",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "szspin",
+    "label": "Clear an S/Z-Spin",
+    "rank": "E",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "ljspin",
+    "label": "Clear an L/J-Spin",
+    "rank": "E",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "combo",
+    "label": "Perform a 5-Combo",
+    "rank": "E",
+    "target": 5,
+    "exclude": ""
+  },
+  {
+    "id": "iflat",
+    "label": "Clear 2 Lines using horizontal I-Pieces",
+    "rank": "E",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "pieces",
+    "label": "Place 20 pieces",
+    "rank": "E",
+    "target": 20,
+    "exclude": ""
+  },
+  {
+    "id": "attack",
+    "label": "Send 6 Attack",
+    "rank": "E",
+    "target": 6,
+    "exclude": ""
+  },
+  {
+    "id": "placeoconsecutive",
+    "label": "Place 2 O-Pieces in a row",
+    "rank": "E",
+    "target": 2,
+    "exclude": "nohold"
+  },
+  {
+    "id": "norotateclockwise",
+    "label": "Place 12 pieces while only rotating counterclockwise",
+    "rank": "E",
+    "target": 12,
+    "exclude": ""
+  },
+  {
+    "id": "singlenocombo",
+    "label": "Clear 6 Singles without starting a combo",
+    "rank": "E",
+    "target": 6,
+    "exclude": ""
+  },
+  {
+    "id": "double",
+    "label": "Clear 4 Doubles",
+    "rank": "D",
+    "target": 4,
+    "exclude": ""
+  },
+  {
+    "id": "spam",
+    "label": "Place 3 pieces in a row without moving or rotating",
+    "rank": "D",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "noclear",
+    "label": "Place 14 pieces in a row without clearing any lines",
+    "rank": "D",
+    "target": 14,
+    "exclude": ""
+  },
+  {
+    "id": "szdouble",
+    "label": "Clear 2 Doubles using S or Z-Pieces",
+    "rank": "D",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "ljtriple",
+    "label": "Clear 2 Triples using L or J-Pieces",
+    "rank": "D",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "ispinclear",
+    "label": "Clear an I-Spin",
+    "rank": "D",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "upperhalfquad",
+    "label": "Clear a Quad in the upper half of the board",
+    "rank": "D",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "rotate",
+    "label": "Rotate 80 times",
+    "rank": "D",
+    "target": 80,
+    "exclude": ""
+  },
+  {
+    "id": "quadcombo",
+    "label": "Clear a Quad while on a 2+-Combo",
+    "rank": "D",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "szsingle",
+    "label": "Clear 2 Singles in a row using S or Z-Pieces",
+    "rank": "D",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "combonohold",
+    "label": "Perform a 3-Combo without using Hold",
+    "rank": "D",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "noclearspin",
+    "label": "Perform 3 Spins that don't clear any lines",
+    "rank": "D",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "szljspin",
+    "label": "Perform 2 S/Z/L/J-Spins",
+    "rank": "D",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "tspintriple",
+    "label": "Clear a T-Spin Triple",
+    "rank": "C",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "nohold",
+    "label": "Place 25 pieces in a row without using Hold",
+    "rank": "C",
+    "target": 25,
+    "exclude": "nohold"
+  },
+  {
+    "id": "triple",
+    "label": "Clear 3 Triples",
+    "rank": "C",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "b2b",
+    "label": "Reach B2B x4",
+    "rank": "C",
+    "target": 4,
+    "exclude": ""
+  },
+  {
+    "id": "quadbuckets",
+    "label": "Clear a Quad in 2 different columns",
+    "rank": "C",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "holdconsecutive",
+    "label": "Use Hold on 12 pieces in a row",
+    "rank": "C",
+    "target": 12,
+    "exclude": "nohold"
+  },
+  {
+    "id": "softdrop",
+    "label": "Place 10 pieces without releasing Soft Drop",
+    "rank": "C",
+    "target": 10,
+    "exclude": ""
+  },
+  {
+    "id": "top3rows",
+    "label": "Have part of your stack in the top 3 rows for 3 seconds",
+    "rank": "C",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "linesnoti",
+    "label": "Clear 10 Lines without clearing with T or I-pieces",
+    "rank": "C",
+    "target": 10,
+    "exclude": ""
+  },
+  {
+    "id": "szspintriple",
+    "label": "Clear an S/Z-Spin Triple",
+    "rank": "C",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "odoubleconsecutive",
+    "label": "Clear 2 Doubles consecutively using two O-Pieces",
+    "rank": "C",
+    "target": 2,
+    "exclude": "nohold"
+  },
+  {
+    "id": "tspinminiclear",
+    "label": "Clear 4 T-Spin Minis",
+    "rank": "C",
+    "target": 4,
+    "exclude": ""
+  },
+  {
+    "id": "attack",
+    "label": "Send 14 Attack",
+    "rank": "C",
+    "target": 14,
+    "exclude": ""
+  },
+  {
+    "id": "doublespiece",
+    "label": "Clear 3 Doubles with the same type of piece",
+    "rank": "C",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "ljgarbage",
+    "label": "Clear Garbage using a L/J-Spin",
+    "rank": "C",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "szgarbage",
+    "label": "Clear Garbage using a S/Z-Spin",
+    "rank": "C",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "columnopiece",
+    "label": "Place 3 O-Pieces in column 1",
+    "rank": "C",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "spinclear",
+    "label": "Clear 2 Spins in one combo",
+    "rank": "C",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "iclearspam",
+    "label": "Clear a Single with an I-Piece without moving or rotating",
+    "rank": "C",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "holddas",
+    "label": "Place 6 Pieces without releasing DAS",
+    "rank": "C",
+    "target": 6,
+    "exclude": ""
+  },
+  {
+    "id": "oclear",
+    "label": "Clear 6 Lines using O-Pieces",
+    "rank": "B",
+    "target": 6,
+    "exclude": ""
+  },
+  {
+    "id": "spinbuckets",
+    "label": "Clear Spin-Clears with 3 different pieces",
+    "rank": "B",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "quad",
+    "label": "Clear 4 Quads",
+    "rank": "B",
+    "target": 4,
+    "exclude": ""
+  },
+  {
+    "id": "spam",
+    "label": "Place 5 pieces in a row without moving or rotating",
+    "rank": "B",
+    "target": 5,
+    "exclude": ""
+  },
+  {
+    "id": "ljspintriple",
+    "label": "Clear an L/J-Spin Triple",
+    "rank": "B",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "quadconsecutive",
+    "label": "Clear 2 Quads in a row",
+    "rank": "B",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "singlesonly",
+    "label": "Clear 8 Singles without doing other clears or using Hold",
+    "rank": "B",
+    "target": 8,
+    "exclude": ""
+  },
+  {
+    "id": "nogarbage",
+    "label": "Have no Garbage Lines on your board for 4 seconds",
+    "rank": "B",
+    "target": 4,
+    "exclude": "duo_reversed"
+  },
+  {
+    "id": "rotate",
+    "label": "Rotate 300 times",
+    "rank": "B",
+    "target": 300,
+    "exclude": ""
+  },
+  {
+    "id": "nocancel",
+    "label": "Don't cancel any garbage for 8 seconds",
+    "rank": "B",
+    "target": 8,
+    "exclude": ""
+  },
+  {
+    "id": "tspindoubleup",
+    "label": "Clear a T-Spin Double with the Piece pointing up",
+    "rank": "B",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "oclearspam",
+    "label": "Clear a Double with an O-Piece without moving or rotating",
+    "rank": "B",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "tnorotate",
+    "label": "Place 3 T-Pieces without rotating any",
+    "rank": "B",
+    "target": 3,
+    "exclude": ""
+  },
+  {
+    "id": "tspincombo",
+    "label": "Clear a T-Spin Double while on a 2+-Combo",
+    "rank": "B",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "combo",
+    "label": "Perform a 7-Combo",
+    "rank": "A",
+    "target": 7,
+    "exclude": ""
+  },
+  {
+    "id": "ispindouble",
+    "label": "Clear an I-Spin Double",
+    "rank": "A",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "szspinconsecutive",
+    "label": "Clear two S/Z-Spin Doubles consecutively",
+    "rank": "A",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "ljspinconsecutive",
+    "label": "Clear two L/J-Spin Doubles consecutively",
+    "rank": "A",
+    "target": 2,
+    "exclude": ""
+  },
+  {
+    "id": "colorclear",
+    "label": "Perform a Color Clear",
+    "rank": "A",
+    "target": 1,
+    "exclude": ""
+  },
+  {
+    "id": "lines",
+    "label": "Clear 40 Lines",
+    "rank": "A",
+    "target": 40,
+    "exclude": ""
+  },
+  {
+    "id": "combospin",
+    "label": "Clear 4 Spins in one Combo",
+    "rank": "A",
+    "target": 4,
+    "exclude": ""
+  },
+  {
+    "id": "tspindtcolumn",
+    "label": "Clear a T-Spin Double/Triple centered in column 1 or 10",
+    "rank": "A",
+    "target": 1,
+    "exclude": ""
+  }
+];
+const BASE=['nohold','messy','gravity','volatile','doublehole','invisible','allspin','expert'];
+const MODS=[...BASE,...BASE.map(n=>n+'_reversed')];
+const CUSTOM_EVENTS=['pieces','pieceheight','survive','lines','spin','attack'];
+const EVENTS=[...CUSTOM_EVENTS,...new Set(OFFICIAL.map(o=>o.id))].filter((value,i,arr)=>arr.indexOf(value)===i);
+
+const OFFICIAL_JA=["{n}コンボを達成する","ダブルを{n}回消す","クアッド（4ライン消し）を達成する","{n}ライン消す","Oミノでシングル（1ライン消し）を達成する","Oミノでダブル（2ライン消し）を達成する","SまたはZミノでダブルを達成する","LまたはJミノでトリプル（3ライン消し）を達成する","Iミノをホールドしたまま{n}ライン消す","ホールドを{n}回使用する","ミノを{n}回回転させる","シングルを{n}回連続で消す","いずれかのスピンを達成する","Tスピン・シングルを達成する","Tスピン・ダブルを達成する","SまたはZスピンを達成する","LまたはJスピンを達成する","{n}コンボを達成する","横向きのIミノを使って{n}ライン消す","ミノを{n}個設置する","相手に{n}ライン分の攻撃を送る","Oミノを{n}個連続で設置する","時計回りに回転せず、反時計回りの回転だけでミノを{n}個置く","コンボを始めずにシングルを{n}回消す","ダブルを{n}回消す","移動も回転もせずにミノを{n}個連続で置く","ラインを消さずにミノを{n}個連続で置く","SまたはZミノでダブルを{n}回消す","LまたはJミノでトリプルを{n}回消す","Iスピンでラインを消す","盤面の上半分でクアッドを達成する","ミノを{n}回回転させる","2コンボ以上の途中でクアッドを達成する","SまたはZミノでシングルを{n}回連続で消す","ホールドを使わずに{n}コンボを達成する","ラインを消さないスピンを{n}回達成する","S・Z・L・Jのいずれかのスピンを{n}回達成する","Tスピン・トリプルを達成する","ホールドを使わずにミノを{n}個連続で置く","トリプルを{n}回消す","バック・トゥ・バック（B2B）を{n}回までつなぐ","異なる{n}列でクアッドを達成する","{n}個のミノを連続してホールドする","ソフトドロップを離さずにミノを{n}個置く","盤面の上から3段以内にブロックがある状態で{n}秒間耐える","TミノとIミノで消さずに{n}ライン消す","SまたはZスピン・トリプルを達成する","Oミノ2個でダブルを{n}回連続して消す","Tスピン・ミニで{n}回ラインを消す","相手に{n}ライン分の攻撃を送る","同じ種類のミノでダブルを{n}回消す","LまたはJスピンでお邪魔ラインを消す","SまたはZスピンでお邪魔ラインを消す","1列目にOミノを{n}個置く","1コンボ中にスピン消しを{n}回達成する","移動も回転もせずにIミノでシングルを消す","移動の自動繰り返し（DAS）を解除せずにミノを{n}個置く","Oミノを使って{n}ライン消す","異なる{n}種類のミノでスピン消しを達成する","クアッドを{n}回達成する","移動も回転もせずにミノを{n}個連続で置く","LまたはJスピン・トリプルを達成する","クアッドを{n}回連続で達成する","ほかの消去やホールドをせずにシングルを{n}回消す","盤面にお邪魔ラインがない状態を{n}秒間維持する","ミノを{n}回回転させる","お邪魔を相殺せずに{n}秒間耐える","上向きのTミノでTスピン・ダブルを達成する","移動も回転もせずにOミノでダブルを消す","回転させずにTミノを{n}個置く","2コンボ以上の途中でTスピン・ダブルを達成する","{n}コンボを達成する","Iスピン・ダブルを達成する","SまたはZスピン・ダブルを{n}回連続で達成する","LまたはJスピン・ダブルを{n}回連続で達成する","カラークリアを達成する","{n}ライン消す","1コンボ中にスピン消しを{n}回達成する","1列目または10列目を中心にTスピン・ダブル／トリプルを達成する"];
+const START=[
+ ['nohold','pieces',8,0,'E','No Hold: 8 PIECES','custom_nohold-place-8'],
+ ['messy','survive',10,10,'E','Messier Garbage: SURVIVE 10s','custom_messy-survive-10'],
+ ['gravity','pieces',6,0,'D','Gravity: PLACE 6 PIECES','custom_gravity-place-6'],
+ ['volatile','survive',10,10,'D','Volatile Garbage: SURVIVE 10s','custom_volatile-survive-10'],
+ ['doublehole','lines',4,0,'D','Double Hole: CLEAR 4 LINES','custom_doublehole-clear-4'],
+ ['invisible','pieces',6,0,'C','Invisible: PLACE 6 PIECES','custom_invisible-place-6'],
+ ['allspin','spin',2,0,'C','All-Spin: PERFORM 2 SPINS','custom_allspin-spin-2'],
+ ['expert','survive',10,10,'D','Expert: SURVIVE 10s','custom_expert-survive-10'],
+ ['nohold_reversed','pieces',6,0,'B','Asceticism: PLACE 6 PIECES','custom_asceticism-place-6'],
+ ['messy_reversed','lines',4,10,'B','Loaded Dice: CLEAR 4 LINES','custom_loaded-dice-clear-4'],
+ ['gravity_reversed','pieces',6,0,'B','Freefall: PLACE 6 PIECES','custom_freefall-place-6'],
+ ['doublehole_reversed','attack',4,0,'B','Damnation: SEND 4 ATTACK','custom_damnation-attack-4'],
+ ['invisible_reversed','pieces',6,0,'A','The Exile: PLACE 6 PIECES','custom_exile-place-6'],
+ ['allspin_reversed','spin',2,0,'A','Warlock: PERFORM 2 SPINS','custom_warlock-spin-2'],
+ ['expert_reversed','survive',10,10,'A','The Tyrant: SURVIVE 10s','custom_tyrant-survive-10']
+];
+// 追加スターター。F〜Aの階層帯に合わせ、同じ基底MODの表裏同時指定はしない。
+// Last Stand (volatile_reversed) は自作復活ミッション対象外のままにする。
+const START_50=[
+ ['','pieces',4,0,'F','Warm-up: PLACE 4 PIECES','starter-warmup-place-4',1,1],
+ ['','lines',2,0,'F','Warm-up: CLEAR 2 LINES','starter-warmup-clear-2',1,1],
+ ['','spin',1,0,'F','Warm-up: PERFORM A SPIN','starter-warmup-spin-1',1,2],
+ ['nohold','lines',2,0,'F','No Hold: CLEAR 2 LINES','starter-nohold-clear-2',1,2],
+ ['messy','pieces',7,0,'E','Messier Garbage: PLACE 7 PIECES','starter-messy-place-7',1,2],
+ ['gravity','survive',8,8,'E','Gravity: SURVIVE 8s','starter-gravity-survive-8',2,3],
+ ['volatile','lines',3,0,'E','Volatile Garbage: CLEAR 3 LINES','starter-volatile-clear-3',3,4],
+ ['doublehole','pieces',8,0,'D','Double Hole: PLACE 8 PIECES','starter-doublehole-place-8',4,5],
+ ['invisible','lines',3,0,'D','Invisible: CLEAR 3 LINES','starter-invisible-clear-3',5,6],
+ ['allspin','spin',3,0,'D','All-Spin: PERFORM 3 SPINS','starter-allspin-spin-3',6,7],
+ ['expert','lines',4,0,'C','Expert: CLEAR 4 LINES','starter-expert-clear-4',7,8],
+ ['nohold+messy','lines',3,0,'D','Ascetic Stack: CLEAR 3 LINES','starter-nohold-messy-clear-3',3,5],
+ ['gravity+volatile','survive',12,12,'C','Falling Pressure: SURVIVE 12s','starter-gravity-volatile-survive-12',4,6],
+ ['doublehole+invisible','lines',4,0,'C','Blind Tunnel: CLEAR 4 LINES','starter-doublehole-invisible-clear-4',5,7],
+ ['allspin+expert','spin',3,0,'B','Precision Tower: PERFORM 3 SPINS','starter-allspin-expert-spin-3',7,9],
+ ['nohold_reversed','lines',3,0,'D','Asceticism: CLEAR 3 LINES','starter-asceticism-clear-3',2,4],
+ ['messy_reversed','lines',4,10,'C','Loaded Dice: CLEAR 4 LINES','starter-loaded-dice-clear-4',3,6],
+ ['gravity_reversed','survive',10,10,'C','Freefall: SURVIVE 10s','starter-freefall-survive-10',4,7],
+ ['doublehole_reversed','attack',4,0,'B','Damnation: SEND 4 ATTACK','starter-damnation-attack-4',5,8],
+ ['invisible_reversed','pieces',8,0,'B','The Exile: PLACE 8 PIECES','starter-exile-place-8',6,9],
+ ['allspin_reversed','spin',3,0,'A','Warlock: PERFORM 3 SPINS','starter-warlock-spin-3',7,10],
+ ['expert_reversed','survive',12,12,'A','The Tyrant: SURVIVE 12s','starter-tyrant-survive-12',8,10],
+ ['nohold_reversed+messy_reversed','lines',4,0,'C','Rigged Ascetic: CLEAR 4 LINES','starter-rigged-ascetic-clear-4',4,7],
+ ['gravity_reversed+invisible_reversed','pieces',7,0,'B','Fallen Exile: PLACE 7 PIECES','starter-fallen-exile-place-7',6,9],
+ ['allspin_reversed+doublehole_reversed','attack',6,0,'A','Blighted Warlock: SEND 6 ATTACK','starter-blighted-warlock-attack-6',7,10],
+ ['allspin_reversed+invisible_reversed','spin',4,0,'A','Veiled Warlock: PERFORM 4 SPINS','starter-veiled-warlock-spin-4',8,10],
+ ['expert_reversed+messy_reversed','survive',14,14,'A','Tyrant Dice: SURVIVE 14s','starter-tyrant-dice-survive-14',8,10],
+ ['nohold+gravity','pieces',9,0,'C','No Hold Gravity: PLACE 9 PIECES','starter-nohold-gravity-place-9',4,6],
+ ['messy+doublehole','lines',4,0,'B','Broken Tunnel: CLEAR 4 LINES','starter-messy-doublehole-clear-4',5,8],
+ ['volatile+allspin','spin',3,0,'B','Volatile Spin: PERFORM 3 SPINS','starter-volatile-allspin-spin-3',6,8],
+ ['invisible+expert','survive',12,12,'A','Blind Expert: SURVIVE 12s','starter-invisible-expert-survive-12',8,10],
+ ['nohold_reversed+gravity_reversed','pieces',8,0,'B','Falling Ascetic: PLACE 8 PIECES','starter-falling-ascetic-place-8',5,8],
+ ['messy_reversed+doublehole_reversed','attack',5,0,'A','Loaded Damnation: SEND 5 ATTACK','starter-loaded-damnation-attack-5',7,10],
+ ['invisible_reversed+expert_reversed','survive',15,15,'A','Exiled Tyrant: SURVIVE 15s','starter-exiled-tyrant-survive-15',8,10],
+ ['allspin+invisible_reversed','spin',3,0,'A','Shadow Spin: PERFORM 3 SPINS','starter-shadow-spin-3',7,10]
+];
+START.push(...START_50);
+// 表示言語の変更はゲーム用JSONを変更しません。MOD名は原文のまま表示します。
+let originalMissionNames=false;
+const EVENT_JA={
+ pieces:'ミノの設置',survive:'時間内の生存',lines:'ライン消去',spin:'スピン',attack:'攻撃'
+};
+const START_NAMES=new Map(START.map(row=>[row[6],{en:row[5],modName:row[5].split(':')[0]}]));
+const templateJa=(p,target)=>{
+ const idx=OFFICIAL.indexOf(p);
+ if(idx<0)return p.label;
+ return OFFICIAL_JA[idx].replace(/\{n\}/g,String(target??p.target));
+};
+const jaEvent=(id)=>{
+ if(EVENT_JA[id])return EVENT_JA[id];
+ const p=OFFICIAL.find(p=>p.id===id);
+ return p?templateJa(p,'指定回数'):'不明な判定';
+};
+const jaShort=(id,n)=>({pieces:`ミノを${n}個設置する`,pieceheight:`操作ミノの高さ到達を${n}回`,survive:`${n}秒間生存する`,lines:`${n}ライン消す`,spin:`スピンを${n}回行う`,attack:`${n}ライン分の攻撃を送る`}[id]||jaEvent(id));
+const displayName=(m)=>{
+ if(originalMissionNames)return m.name;
+ const start=START_NAMES.get(m.id);
+ if(start&&start.en===m.name)return `${start.modName}：${jaShort(m.event,m.target)}`;
+ const template=OFFICIAL.find(p=>p.label===m.name&&p.id===m.event);
+ if(template)return templateJa(template,m.target);
+ if(m.name==='New Mission')return '新しいミッション';
+ return m.name;
+};
+const eventDisplay=(id)=>originalMissionNames? id : jaEvent(id);
+const setLang=()=>{
+ originalMissionNames=$('nameView').value==='original';
+ drawList();drawEditor();
+};
+
+const defaults=()=>({when:{floorMin:1,floorMax:10,reviveMin:0,reviveMax:99,modsAll:[],modsNone:[]},effects:{visibility:{hold:true,holdContent:true,next:true,nextCount:5,nextHidden:[],nextWhenSpawnSlots:[],nextSlots:Array.from({length:6},()=>({mode:'normal',visiblePercent:100,period:5})),nextWhenSpawnHidden:false,modes:Object.fromEntries(['stack','garbage','active','ghost','next','hold'].map(key=>[key,{mode:'normal',visiblePercent:100,period:5,afterLock:false}]))},holdEnabled:true,sound:{rotation:true},boardRotation:{enabled:false,mode:'fixed',degrees:180,durationMs:700},controls:{reverseHorizontal:false,reverseRotation:false}}});
+const fresh=(row)=>{const [mod,event,target,timeout,rank,name,id,floorMin,floorMax]=row;let other=defaults(),mods=mod?mod.split('+'):[];const band={F:[1,2],E:[1,3],D:[3,5],C:[4,7],B:[6,9],A:[8,10]}[rank]||[1,10];other.when.floorMin=floorMin??band[0];other.when.floorMax=floorMax??band[1];if(mods.includes('nohold_reversed'))other.effects.visibility.nextCount=1;if(mods.some(m=>m==='nohold'||m==='nohold_reversed'))other.effects.holdEnabled=false;return {id,source:'custom',name,event,target,count:target,timeout,timerStart:event==='lines'?'first-clear':'immediate',mods,mod:mods[0]||'',modLabels:mods,applyModRules:true,penaltyEvents:[event,...(mods.includes('nohold')?['nohold']:[])],requiresAttack:event==='attack',rank:rank||null,rankMode:rank?'fixed':'auto',rules:{piece:'',pieces:[],facing:'',facings:[],holdRequired:false,columnMin:1,columnMax:10,height:{enabled:false,rows:0,compare:'atMost',requireCrossing:true},lines:{enabled:false,compare:'exact',count:1},resetOn:[],resetOnMismatch:false,rotationInput:'any',softDrop:'any',horizontal:'any',spinType:'any'},...other}};
+let data={schema:8,starterInstalled:true,testSequence:['','',''],missions:START.map(fresh)};let selected=0;let filter='ALL';
+const $=id=>document.getElementById(id);
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const numeric=(v,min,max,field)=>{const n=Number(v);if(!Number.isInteger(n)||n<min||n>max)throw Error(field+`は${min}～${max}の整数にしてください`);return n};
+function normalizeMods(values){if(!Array.isArray(values))return [];const result=[...new Set(values.filter(v=>MODS.includes(v)))];if(new Set(result.map(m=>m.replace(/_reversed$/,''))).size!==result.length)throw Error('同じMODの通常とリバースを同時指定できません');return result}
+function normalize(row){const m=clone(row);if(!m.id||!m.name||!EVENTS.includes(m.event))throw Error('ID・名前・イベントを確認してください');m.id=String(m.id).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,48);m.name=String(m.name).trim().slice(0,48);m.target=m.count=numeric(m.target,1,999,'目標値');m.timeout=numeric(m.timeout||0,0,600,'制限時間');m.timerStart=m.event==='survive'?'immediate':(m.timerStart??(m.event==='lines'?'first-clear':'immediate'));if(!['immediate','first-clear'].includes(m.timerStart))throw Error('カウント開始の設定が不正です');m.mods=normalizeMods(m.mods|| (m.mod?[m.mod]:[]));m.mod=m.mods[0]||'';m.modLabels=normalizeMods(m.modLabels??m.mods);m.applyModRules=m.applyModRules!==false;
+ m.penaltyEvents=[...new Set((m.penaltyEvents??[m.event,...(m.applyModRules&&m.mods.includes('nohold')?['nohold']:[])]).map(s=>String(s).trim()))];
+ if(m.penaltyEvents.some(x=>!/^[a-z][a-z0-9_]{0,39}$/.test(x))||m.penaltyEvents.length>24)throw Error('ペナルティ判定IDが不正です');m.rankMode=(m.rankMode==='auto'||m.rank==null||m.rank==='')?'auto':'fixed';m.rank=['F','E','D','C','B','A'].includes(m.rank)?m.rank:null;m.source='custom';m.when={...defaults().when,...m.when};for(const name of ['floorMin','floorMax'])m.when[name]=numeric(m.when[name],1,10,name);for(const name of ['reviveMin','reviveMax'])m.when[name]=numeric(m.when[name],0,99,name);if(m.when.floorMin>m.when.floorMax||m.when.reviveMin>m.when.reviveMax)throw Error('出現条件の範囲が逆です');m.when.modsAll=normalizeMods(m.when.modsAll||[]);m.when.modsNone=normalizeMods(m.when.modsNone||[]);m.effects={...defaults().effects,...m.effects,visibility:{...defaults().effects.visibility,...m.effects?.visibility},sound:{rotation:m.effects?.sound?.rotation!==false}};const vis=m.effects.visibility;vis.hold=vis.hold!==false;vis.holdContent=vis.holdContent!==false;vis.next=vis.next!==false;vis.nextCount=numeric(vis.nextCount??5,0,6,'次のミノの個数');vis.nextHidden=[...new Set((vis.nextHidden||[]).map(Number))].filter(v=>Number.isInteger(v)&&v>=1&&v<=6).sort((a,b)=>a-b);vis.nextWhenSpawnSlots=[...new Set((vis.nextWhenSpawnSlots||[]).map(Number))].filter(v=>Number.isInteger(v)&&v>=1&&v<=5).sort((a,b)=>a-b);
+ vis.nextSlots=Array.from({length:6},(_,i)=>{const x=vis.nextSlots?.[i]||{},mode=x.mode||'normal';if(!['normal','hidden','pulse','fade-in','gradient'].includes(mode))throw Error('NEXT'+(i+1)+'番目の表示モードが不正です');return {mode,visiblePercent:numeric(x.visiblePercent??100,0,100,'NEXT表示率'),period:numeric(x.period??5,1,60,'NEXT周期')}});m.effects.holdEnabled=m.effects.holdEnabled!==false;vis.nextWhenSpawnHidden=vis.nextWhenSpawnHidden===true;
+ vis.modes=vis.modes||{};for(const key of ['stack','garbage','active','ghost','next','hold']){
+  const obj=vis.modes[key]||{},mode=obj.mode||'normal';
+  if(!['normal','hidden','pulse','fade-in','gradient'].includes(mode))throw Error(key+'の表示方法が不正です');
+  vis.modes[key]={mode,visiblePercent:numeric(obj.visiblePercent??100,0,100,'表示率'),period:numeric(obj.period??5,1,60,'周期'),afterLock:obj.afterLock===true};
+ }
+ m.effects.boardRotation={enabled:m.effects.boardRotation?.enabled===true,mode:m.effects.boardRotation?.mode==='random'?'random':'fixed',degrees:numeric(m.effects.boardRotation?.degrees??180,0,360,'回転角度'),durationMs:numeric(m.effects.boardRotation?.durationMs??700,0,3000,'回転演出時間')};m.effects.controls={reverseHorizontal:m.effects.controls?.reverseHorizontal===true,reverseRotation:m.effects.controls?.reverseRotation===true};m.rules={piece:'',pieces:[],facing:'',facings:[],holdRequired:false,columnMin:1,columnMax:10,height:{enabled:false,rows:0,compare:'atMost',requireCrossing:true},lines:{enabled:false,compare:'exact',count:1},resetOn:[],resetOnMismatch:false,rotationInput:'any',softDrop:'any',horizontal:'any',spinType:'any',...(m.rules||{})};
+ const allPieces=['I','O','T','S','Z','J','L'];
+ const legacyPiece=String(m.rules.piece||'').toUpperCase();
+ m.rules.pieces=[...new Set((m.rules.pieces?.length?m.rules.pieces:legacyPiece?[legacyPiece]:[]).map(x=>String(x).toUpperCase()))];
+ if(m.rules.pieces.some(x=>!allPieces.includes(x)))throw Error('指定ミノが不正です');
+ m.rules.piece=m.rules.pieces.length===1?m.rules.pieces[0]:'';
+ const legacyFacing=m.rules.facing===''||m.rules.facing==null?'':Number(m.rules.facing);
+ m.rules.facings=[...new Set((m.rules.facings?.length?m.rules.facings:legacyFacing===''?[]:[legacyFacing]).map(Number))];
+ if(m.rules.facings.some(x=>![0,90,180,270].includes(x)))throw Error('向きは0/90/180/270度です');
+ m.rules.facing=m.rules.facings.length===1?m.rules.facings[0]:'';
+ m.rules.columnMin=numeric(m.rules.columnMin,1,10,'列の始点');m.rules.columnMax=numeric(m.rules.columnMax,1,10,'列の終点');
+ if(m.rules.columnMin>m.rules.columnMax)throw Error('列指定の範囲が逆です');
+ const h={enabled:false,rows:0,compare:'atMost',requireCrossing:true,...m.rules.height};
+ h.enabled=h.enabled===true||m.event==='pieceheight';h.rows=numeric(h.rows,0,39,'床からの高さ');
+ if(!['atMost','atLeast'].includes(h.compare))throw Error('高さの比較が不正です');
+ h.requireCrossing=h.requireCrossing!==false;m.rules.height=h;
+ const l={enabled:false,compare:'exact',count:1,...m.rules.lines};
+ if(!['exact','atLeast','atMost'].includes(l.compare))throw Error('ラインの比較条件が不正です');
+ l.count=numeric(l.count,0,4,'ライン数');l.enabled=l.enabled===true;m.rules.lines=l;
+ m.rules.resetOn=[...new Set(Array.isArray(m.rules.resetOn)?m.rules.resetOn:[])];
+ const keyChoices=['hold','moveLeft','moveRight','rotateCW','rotateCCW','rotate180','softDrop','hardDrop'];
+ if(m.rules.resetOn.some(x=>!keyChoices.includes(x)))throw Error('リセット操作が不正です');
+ m.rules.resetOnMismatch=m.rules.resetOnMismatch===true;
+ m.rules.rotationInput=['any','only180','onlyCWCCW'].includes(m.rules.rotationInput)?m.rules.rotationInput:'any';
+ m.rules.softDrop=['any','held','forbid'].includes(m.rules.softDrop)?m.rules.softDrop:'any';
+ m.rules.horizontal=['any','leftHeld','rightHeld','eitherHeld'].includes(m.rules.horizontal)?m.rules.horizontal:'any';
+ m.rules.spinType=['any','full','mini','empty'].includes(m.rules.spinType)?m.rules.spinType:'any';
+ if(!['pieces','pieceheight','spin','lines'].includes(m.event)&&(m.rules.pieces.length||m.rules.facings.length||m.rules.holdRequired||m.rules.columnMin>1||m.rules.columnMax<10||h.enabled||l.enabled||m.rules.spinType!=='any'))throw Error('詳細条件を利用できるのは設置・高さ・Spin・ライン消去です');
+ if(!['spin','lines'].includes(m.event)&&l.enabled)throw Error('消去ライン数はSpin・ライン消去の条件です');
+ if(m.event!=='spin'&&m.rules.spinType!=='any')throw Error('Spin種別はSpin達成条件専用です');
+ m.requiresAttack=!!m.requiresAttack;return m}
+function importData(value){if(!value||!Array.isArray(value.missions))throw Error('missions配列がありません');if(value.missions.length>128)throw Error('最大128件まで');const missions=value.missions.map((mission,index)=>{try{return normalize(mission)}catch(err){throw Error(`${index+1}件目${mission?.id?'（'+mission.id+'）':''}：${err.message}`)}});const ids=missions.map(m=>m.id);if(new Set(ids).size!==ids.length)throw Error('IDが重複しています');data={schema:8,starterInstalled:value.starterInstalled!==false,testSequence:Array.isArray(value.testSequence)?value.testSequence.slice(0,3):['','',''],missions};selected=0;filter='ALL';drawFilters();drawList();drawEditor();status('読込完了：'+missions.length+'件')}
+function exportData(){return JSON.stringify({schema:8,starterInstalled:data.starterInstalled!==false,testSequence:data.testSequence,missions:data.missions.map(normalize)},null,2)}
+// エクスポートしたJSONだけでなく、テキストとして共有されたJSONもそのまま読み込む。
+function parseMissionText(text){
+ let body=String(text??'').replace(/^\uFEFF/,'').trim();
+ const fenced=body.match(/^```(?:json|JSON)?\s*\n([\s\S]*?)\n```\s*$/);
+ if(fenced)body=fenced[1].trim();
+ if(!body)throw Error('ファイルにJSONデータがありません');
+ try{return JSON.parse(body)}catch(err){throw Error('JSONの形式を確認してください：'+err.message)}
+}
+function rememberOpened(){
+ try{localStorage.setItem(LAST_OPENED,JSON.stringify(data));localStorage.removeItem(DRAFT)}catch{}
+}
+function importText(text){
+ const incoming=parseMissionText(text);
+ importData(incoming);
+ dirty=false;
+ rememberOpened();
+ drawList();
+}
+
+/* ===== v5.3 UI ===== */
+let query='',tab='basic',dirty=false,tplQuery='',tt,sortMode='rank';
+const CORE_EVENTS=[['pieces','ミノを置く'],['pieceheight','操作ミノの最下部の高さ'],['lines','ラインを消す'],['spin','スピンする'],['attack','火力を送る'],['survive','生存する'],['combo','コンボを達成する'],['quad','Quadを達成する'],['b2b','B2Bを達成する']];
+const REDUNDANT_SPIN_EVENTS=new Set(["tspinsingle", "tspindouble", "tspintriple", "tspindoubleup", "tspinminiclear", "szspin", "ljspin", "ispinclear", "szljspin", "szspintriple", "ljspintriple", "ispindouble", "noclearspin"]);
+const ADV_GROUPS=[
+ ['スピン・回転',['rotate','tspinsingle','tspindouble','tspintriple','tspinminiclear','szspin','ljspin','ispinclear','szljspin','szspintriple','ljspintriple','ispindouble','noclearspin','szspinconsecutive','ljspinconsecutive','tspindoubleup']],
+ ['Combo・Quad・B2B',['combo','quad','quadcombo','quadbuckets','quadconsecutive','b2b','spinclear','combospin','tspincombo','singlenocombo','singleconsecutive']],
+ ['ミノ・HOLD・操作',['hold','holdconsecutive','nohold','combonohold','placeoconsecutive','spam','noclear','softdrop','holddas','norotateclockwise','tnorotate','iflat','iholdlines','columnopiece']],
+ ['特殊消去・その他',['double','triple','osingle','odouble','szdouble','ljtriple','oclear','oclearspam','szsingle','odoubleconsecutive','doublespiece','iclearspam','linesnoti','colorclear','upperhalfquad','top3rows','nogarbage','nocancel','ljgarbage','szgarbage','spinbuckets','tspindtcolumn','singlesonly']]
+];
+const CORE_SET=new Set(CORE_EVENTS.map(x=>x[0]));
+const coreEventOpts=(event)=>opts([[event&&!CORE_SET.has(event)?event:'',event&&!CORE_SET.has(event)?'詳細条件を選択中':'基本条件を選択'],...CORE_EVENTS],CORE_SET.has(event)?event:'');
+const advancedEventOpts=(event)=>'<option value="">詳細条件を選ぶ</option>'+ADV_GROUPS.map(([name,items])=>'<optgroup label="'+esc(name)+'">'+opts(items.filter(x=>EVENTS.includes(x)&&(!REDUNDANT_SPIN_EVENTS.has(x)||x===event)).map(x=>[x,REDUNDANT_SPIN_EVENTS.has(x)?eventDisplay(x)+'（旧形式・編集可）':eventDisplay(x)]),event)+'</optgroup>').join('');
+const RANKS=['F','E','D','C','B','A'],DRAFT='qp-mission-editor-draft',LAST_OPENED='qp-mission-editor-last-opened';
+const MOD_JA={nohold:'ホールド禁止',messy:'乱雑なお邪魔',gravity:'高重力',volatile:'不安定なお邪魔',doublehole:'二重穴',invisible:'透明ミノ',allspin:'オールスピン',expert:'エキスパート'};
+const modJa=k=>(MOD_JA[k.replace(/_reversed$/,'')]||k)+(k.endsWith('_reversed')?'（リバース）':'');
+const MODE_JA=[['normal','通常'],['hidden','非表示'],['pulse','点滅'],['fade-in','徐々に表示'],['gradient','一部だけ表示']];
+const TABS=[['basic','基本'],['rules','ルール'],['look','見え方'],['when','出現条件'],['adv','詳細']];
+const AP=[['stack','自分が置いたミノ'],['garbage','お邪魔ブロック'],['active','操作中のミノ'],['ghost','ゴースト'],['next','NEXT欄'],['hold','HOLD欄']];
+const esc=escapeHtml,M=()=>data.missions[selected];
+const getP=(o,p)=>p.split('.').reduce((a,k)=>a?.[k],o);
+const setP=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();let a=o;for(const k of ks)a=a[k]??={};a[l]=v};
+function status(msg,err=false,act){const s=$('status');s.className=err?'show error':'show';s.innerHTML=esc(msg)+(act?` <button type="button" id="act">${esc(act[0])}</button>`:'');if(act)$('act').onclick=()=>{act[1]();s.className=''};clearTimeout(tt);tt=setTimeout(()=>s.className='',act?9000:3000)}
+const opts=(list,sel)=>list.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(sel)?'selected':''}>${esc(l)}</option>`).join('');
+const sw=(p,label,help='')=>`<label class="sw"><input type="checkbox" data-p="${p}" ${getP(M(),p)?'checked':''}><span><b>${label}</b>${help?`<small>${help}</small>`:''}</span></label>`;
+const num=(p,label,min,max)=>`<label class="fld">${label}<input type="number" data-p="${p}" min="${min}" max="${max}" value="${getP(M(),p)??''}"></label>`;
+const chips=(path,label,list)=>{const on=getP(M(),path)||[];return `<div class="help">${label}</div><div class="chips">${list.map(k=>`<button type="button" class="chip" data-chip="${path}" data-v="${k}" title="${k}" aria-pressed="${on.includes(k)}">${modJa(k)}</button>`).join('')}</div>`};
+const modRows=(path,t)=>chips(path,t+'：通常',MODS.slice(0,8))+chips(path,'リバース版',MODS.slice(8));
+const ap=(b,label,extra='')=>{const x=getP(M(),b)||{},md=x.mode||'normal';return `<div class="ap"><b>${label}</b><label class="fld">見え方<select data-p="${b}.mode" data-re="1">${opts(MODE_JA,md)}</select></label>${['pulse','gradient'].includes(md)?num(b+'.visiblePercent','表示率（％）',0,100):'<span></span>'}${['pulse','fade-in'].includes(md)?num(b+'.period','周期（秒）',1,60):'<span></span>'}${extra}</div>`};
+
+function drawFilters(){const cnt=r=>r==='ALL'?data.missions.length:data.missions.filter(m=>effectiveEditorRank(m)===r).length;$('filters').innerHTML=['ALL','AUTO',...RANKS].map(r=>`<button type="button" class="chip" data-f="${r}" aria-pressed="${r===filter}">${r==='ALL'?'すべて':r} ${cnt(r)}</button>`).join('')}
+function drawTestSequence(){const ids=new Set(data.missions.map(m=>m.id));data.testSequence=Array.from({length:3},(_,i)=>ids.has(data.testSequence?.[i])?data.testSequence[i]:'');$('testSequence').innerHTML=data.testSequence.map((id,i)=>`<label class="fld">${i+1}番目<select data-fixed="${i}">${opts([['','自動（ランダム）'],...data.missions.map(m=>[m.id,`${effectiveEditorRank(m)}｜${displayName(m)}`])],id)}</select></label>`).join('')}
+function drawList(){const q=query.trim().toLowerCase();const found=data.missions.map((m,i)=>({m,i})).filter(({m})=>(filter==='ALL'||effectiveEditorRank(m)===filter)&&(!q||(displayName(m)+m.name+m.id).toLowerCase().includes(q)));
+ if(sortMode==='rank')found.sort((a,b)=>(RANKS.indexOf(effectiveEditorRank(a.m))<0?99:RANKS.indexOf(effectiveEditorRank(a.m)))-(RANKS.indexOf(effectiveEditorRank(b.m))<0?99:RANKS.indexOf(effectiveEditorRank(b.m)))||displayName(a.m).localeCompare(displayName(b.m),'ja'));
+ if(sortMode==='mod')found.sort((a,b)=>String(a.m.mods?.[0]||'').localeCompare(String(b.m.mods?.[0]||''))||(RANKS.indexOf(effectiveEditorRank(a.m))<0?99:RANKS.indexOf(effectiveEditorRank(a.m)))-(RANKS.indexOf(effectiveEditorRank(b.m))<0?99:RANKS.indexOf(effectiveEditorRank(b.m))));
+ $('list').innerHTML=found.map(({m,i})=>`<button type="button" class="mission" data-i="${i}" aria-selected="${i===selected}"><span class="rank" data-r="${effectiveEditorRank(m)}">${effectiveEditorRank(m)}</span><span><b>${esc(displayName(m))}</b><small>目標 ${m.target}${m.timeout?`・${m.timeout}秒`:''}・${esc((m.mods||[]).map(modJa).join('＋')||'MODなし')}</small></span></button>`).join('')||'<small>該当するミッションがありません</small>';
+ drawFilters();drawTestSequence();$('json').value=JSON.stringify(data,null,2);$('download').textContent=dirty?'保存 ●':'保存'}
+
+const pickButtons=(path,list,labels)=>{const on=getP(M(),path)||[];return `<div class="chips">${list.map((item,i)=>`<button type="button" class="chip" data-pick="${path}" data-v="${item}" aria-pressed="${on.map(String).includes(String(item))}">${esc(labels?.[i]??item)}</button>`).join('')}</div>`};
+const effectiveEditorRank=m=>(m.mods?.length||m.mod)?'A':(m.rankMode==='auto'||!m.rank?'AUTO':m.rank);
+const KEY_NAMES=[['hold','HOLD'],['moveLeft','左移動'],['moveRight','右移動'],['rotateCW','右回転 (CW)'],['rotateCCW','左回転 (CCW)'],['rotate180','180°回転'],['softDrop','ソフトドロップ'],['hardDrop','ハードドロップ']];
+const ruleSelect=(path,label,items)=>`<label class="fld">${label}<select data-p="${path}" data-re="1">${opts(items,getP(M(),path))}</select></label>`;
+const heightOptions=m=>`<div class="grid"><label class="fld">高さの比較<select data-p="rules.height.compare">${opts([['atMost','床から指定段以下'],['atLeast','床から指定段以上']],m.rules?.height?.compare||'atMost')}</select></label>${num('rules.height.rows','床から何段（0～39）',0,39)}</div>`;
+function panel(m,v,e,w){
+ if(tab==='basic')return `<label class="fld">ミッション名<input type="text" data-p="name" maxlength="48" value="${esc(m.name)}"><small>一覧での表示：${esc(displayName(m))}（保存データにはこの名前が入ります）</small></label>
+  <small>達成に関係するミノ・向き・Spin・操作・失敗条件はこの「基本」タブ内でまとめて編集できます。</small><div class="fld">ランク<div class="seg"><button type="button" data-seg="AUTO" aria-pressed="${m.rankMode==='auto'}">自動</button>${RANKS.map(r=>`<button type="button" data-seg="${r}" aria-pressed="${m.rankMode!=='auto'&&m.rank===r}">${r}</button>`).join('')}</div><small>自動＝通常ミッションの抽選ランクに合わせる。MOD指定があれば保存ランクに関係なく実効ランクA。</small></div>
+  <label class="fld">達成条件（基本）<select data-p="event" data-re="1">${coreEventOpts(m.event)}</select></label>
+  <details class="box" ${CORE_SET.has(m.event)?'':'open'}><summary>その他の公式達成条件（互換性用）</summary><small>T-Spin / S・Z Spin / Spin Doubleなどは上のSpinに集約。旧ミッションを読み込んだ場合のIDは維持します。</small>
+  <select data-p="event" data-re="1">${advancedEventOpts(m.event)}</select></details>
+  <div class="grid">${num('target','目標回数・数値',1,999)}${num('timeout','制限時間（秒・0で無制限）',0,600)}</div>
+  ${m.timeout>0&&m.event!=='survive'?`<label class="fld">制限時間のカウント開始<select data-p="timerStart">${opts([['immediate','ミッションが表示された時'],['first-clear','最初にラインを消した時']],m.timerStart)}</select><small>時間切れになると進捗を0に戻して再挑戦します。</small></label>`:''}
+  ${m.event==='pieceheight'?'<small>操作中のミノの実ブロック最下部が高さ条件を満たした時だけカウント。置いた後のブロック・NEXT・ゴーストは対象外です。0段への接触は最初の観測フレームでも判定します。</small>':''}${sw('requiresAttack','攻撃・お邪魔ラインが必要なミッション')}
+  ${['pieces','pieceheight','spin','lines'].includes(m.event)?`<details class="box" open data-section="mino"><summary><b>ミノ・向き・配置</b></summary>
+   <small>複数選択可。未選択の場合は全ミノ・全方向が対象です。I/O/T/S/Z/J/Lを直接選べます。</small>
+   <div class="help">対象ミノ（SとZの両方など）</div>${pickButtons('rules.pieces',['I','O','T','S','Z','J','L'])}
+   <div class="help">最後の向き（Pointing Up = 0°）</div>${pickButtons('rules.facings',[0,90,180,270],['Pointing Up (0°)','Right (90°)','Down (180°)','Left (270°)'])}
+   ${sw('rules.holdRequired','条件達成前にHOLDを使用する')}
+   <div class="grid">${num('rules.columnMin','基準列：始点',1,10)}${num('rules.columnMax','基準列：終点',1,10)}</div>
+   ${m.event==='pieces'?sw('rules.height.enabled','設置時の最下部の高さも判定'):''}
+   ${m.event==='pieceheight'||m.rules.height?.enabled?heightOptions(m):''}
+   ${m.event==='pieceheight'?sw('rules.height.requireCrossing','高さの境界を通過した場合のみ成功'):''}
+   <small>高さの基準は実ブロック最下部。床は0段です。</small>
+  </details>`:''}
+  ${['spin','lines'].includes(m.event)?`<details class="box" open data-section="spin"><summary><b>Spin・消去ライン</b></summary>
+    ${m.event==='spin'?ruleSelect('rules.spinType','Spinの種類',[['any','Any Spin'],['full','通常のSpin（Mini以外）'],['mini','Mini Spin'],['empty','空Spin（ライン消去なし）']]):''}
+    ${sw('rules.lines.enabled','1回の消去ライン数を指定')}
+    ${m.rules.lines.enabled?`<div class="grid">${ruleSelect('rules.lines.compare','比較方法',[['exact','ちょうど'],['atLeast','以上'],['atMost','以下']])}${num('rules.lines.count','消去ライン数（0～4）',0,4)}</div>`:''}
+    <small>例：T-Spin Double = Spin + Tミノ + 2ライン（ちょうど）。上向き指定を加えるとPointing Upになります。Mini/Spinの成立はゲーム側の判定イベントを使用します。</small>
+  </details>`:''}
+  <details class="box" data-section="inputs"><summary><b>操作キー・継続押下・リセット条件</b></summary>
+   <div class="grid">${ruleSelect('rules.rotationInput','回転の制限',[['any','指定なし'],['only180','180°回転のみ'],['onlyCWCCW','左右回転のみ（180°禁止）']])}${ruleSelect('rules.softDrop','ソフトドロップ',[['any','指定なし'],['held','押し続ける（離すと不成立）'],['forbid','禁止（自然落下・ハードドロップのみ）']])}${ruleSelect('rules.horizontal','左右入力を押し続ける条件',[['any','指定なし'],['leftHeld','左を押した状態で達成'],['rightHeld','右を押した状態で達成'],['eitherHeld','左右いずれかを押した状態で達成']])}</div>
+   ${sw('rules.resetOnMismatch','追加条件を満たさなかったら進捗を0に戻す','OFFならその操作・設置を数えず、進捗を保持します。')}
+   <div class="help">押すと進捗を初期化するキー（複数選択）</div>${pickButtons('rules.resetOn',KEY_NAMES.map(x=>x[0]),KEY_NAMES.map(x=>x[1]))}
+   <small>これらの条件はミッションの進捗に作用します。ゲームの入力やAI操作自体は変更しません。キー監視・Spin詳細の実ゲーム対応は未検証です。</small>
+  </details>
+  <details class="box" data-section="failure"><summary><b>失敗時の判定イベント</b></summary><label class="fld">ミスとして扱うイベントID（半角カンマ区切り）<input type="text" data-p="penaltyEvents" value="${esc((m.penaltyEvents||[m.event]).join(','))}"><small>例：nohold,spam　空欄ならなし</small></label>
+  </details>`;
+ if(tab==='rules')return `<div class="box"><h3>追加ルール（MOD）</h3>${modRows('mods','このミッション中に適用')}<small>タップで切り替え。通常とリバースは同時に選べません（選ぶと入れ替わります）。</small>${sw('applyModRules','MODの実際の効果を有効にする','OFFにすると名前だけ残し、効果は下の個別設定で調整できます。')}</div>
+  <div class="box"><h3>ホールド</h3>${sw('effects.visibility.hold','ホールド欄を表示')}${sw('effects.visibility.holdContent','ホールド欄の中身（ミノ）を表示')}${sw('effects.holdEnabled','ホールド操作を許可')}</div>
+  <div class="box"><h3>操作・盤面</h3>${sw('effects.controls.reverseHorizontal','左右操作を反転')}${sw('effects.controls.reverseRotation','回転操作（CW/CCW）を反転')}${sw('effects.boardRotation.enabled','プレイヤーの盤面を回転','このミッションで操作中の盤面だけを回転。終了時に元に戻ります。')}${e.boardRotation?.enabled?ruleSelect('effects.boardRotation.mode','回転角度の指定',[['fixed','固定角度'],['random','ランダム（発動ごとに1～359°）']]):''}${e.boardRotation?.enabled&&e.boardRotation.mode!=='random'?num('effects.boardRotation.degrees','固定回転角度（0～360°）',0,360):''}${e.boardRotation?.enabled?num('effects.boardRotation.durationMs','回転演出の長さ（ミリ秒）',0,3000):''}${e.boardRotation?.enabled?'<small>180°では左右・CW/CCW入力も自動反転。それ以外の角度では見た目を回転し、操作・衝突判定は維持します。</small>':''}${sw('effects.sound.rotation','回転音を鳴らす')}</div>`;
+ if(tab==='look'){const n=v.nextCount??5,hid=v.nextHidden||[];return `<div class="box"><h3>NEXT（次のミノ）</h3>${sw('effects.visibility.next','NEXT欄を表示')}${num('effects.visibility.nextCount','表示個数（0～6）',0,6)}<div class="help">隠したい位置をタップ（1番目＝一番上）</div><div class="strip">${[1,2,3,4,5,6].map(i=>`<button type="button" class="nx" data-nh="${i}" aria-pressed="${hid.includes(i)}" ${i>n?'disabled':''}>${i}</button>`).join('')}</div>
+   <details><summary>操作中になった時に隠す位置</summary><div class="chips">${[1,2,3,4,5].map(i=>`<button type="button" class="chip" data-ns="${i}" aria-pressed="${(v.nextWhenSpawnSlots||[]).includes(i)}">${i}番目</button>`).join('')}</div><small>選んだ位置のミノが操作中になった時だけ非表示にします。</small></details></div>
+  <div class="box"><h3>ミノの見え方</h3><small>点滅＝指定した割合の時間だけ表示／一部だけ表示＝指定した割合だけ表示（NEXTは下から隠す）</small>${AP.map(([k,l])=>ap('effects.visibility.modes.'+k,l,k==='stack'?sw('effects.visibility.modes.stack.afterLock','設置したミノは表示する'):'')).join('')}</div>
+  <details class="box"><summary>NEXT 1～6番目を個別に設定</summary>${[0,1,2,3,4,5].map(i=>ap('effects.visibility.nextSlots.'+i,`${i+1}番目`)).join('')}</details>`}
+ if(tab==='when')return `<div class="box"><h3>出現する条件</h3><p class="help">フロア${w.floorMin}～${w.floorMax}、復活${w.reviveMin}～${w.reviveMax}回目に出現</p><div class="grid">${num('when.floorMin','フロア下限',1,10)}${num('when.floorMax','フロア上限',1,10)}${num('when.reviveMin','復活回数下限',0,99)}${num('when.reviveMax','復活回数上限',0,99)}</div></div>
+  <div class="box"><h3>MODの条件（出現時に有効なMODで判定）</h3>${modRows('when.modsAll','必要なMOD')}${modRows('when.modsNone','禁止するMOD')}</div>`;
+ return `  <div class="box"><h3>MOD表示ラベル</h3>${modRows('modLabels','整理用ラベル')}<small>エディタ内の整理用です。ゲームのルールには影響しません。</small></div><small>ID：${esc(m.id)}</small>`}
+
+// Remember expanded <details> across updates and tab switches; mission JSON unchanged.
+const expandedSectionsByTab=new Map();
+let lastRenderedEditorTab=null;
+function drawEditor(){
+ const root=$('editor');
+ if(lastRenderedEditorTab!==null){
+  expandedSectionsByTab.set(lastRenderedEditorTab,Array.from(root.querySelectorAll('details')).flatMap((section,index)=>section.open?[index]:[]));
+ }
+ const m=M();if(!m){root.innerHTML='<p>ミッションがありません。「＋ 新規」で作成してください。</p>';lastRenderedEditorTab=tab;return}
+ const e=m.effects,v=e.visibility,w=m.when;
+ root.innerHTML=`<div class="top"><span class="rank" data-r="${effectiveEditorRank(m)}">${effectiveEditorRank(m)}</span><h2>${esc(displayName(m))}</h2><button type="button" id="dup">複製</button><button type="button" id="del">削除</button></div>
+ <div class="chips">${(m.mods||[]).map(k=>`<span class="chip" style="border:1px solid var(--border)">${esc(modJa(k))}</span>`).join('')||'<small>MODなし</small>'}</div>
+ <div class="tabs" role="tablist">${TABS.map(([k,l])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${k===tab}">${l}</button>`).join('')}</div>${panel(m,v,e,w)}`;
+ const sections=root.querySelectorAll('details');
+ for(const index of expandedSectionsByTab.get(tab)||[]){if(sections[index])sections[index].open=true}
+ lastRenderedEditorTab=tab;
+}
+function redraw(){drawList();drawEditor()}
+function changed(re){dirty=true;try{localStorage.setItem(DRAFT,JSON.stringify(data))}catch{}drawList();if(re)drawEditor()}
+function append(m){data.missions.splice(selected+1,0,m);selected++;filter='ALL';query='';$('q').value='';dirty=true;try{localStorage.setItem(DRAFT,JSON.stringify(data))}catch{}redraw();status('追加しました')}
+function addTemplate(i){const p=OFFICIAL[i],m=fresh(['',p.id,p.target,0,p.rank,p.label,`template_${p.id}_${Date.now()}`]);
+ // Known official Spin variants are expressed by shared Spin + piece + line + facing rules.
+ const compound={tspinsingle:{pieces:['T'],lines:1},tspindouble:{pieces:['T'],lines:2},tspintriple:{pieces:['T'],lines:3},tspindoubleup:{pieces:['T'],lines:2,facings:[0]},
+  szspin:{pieces:['S','Z']},ljspin:{pieces:['L','J']},ispinclear:{pieces:['I']},szljspin:{pieces:['S','Z','L','J']},
+  szspintriple:{pieces:['S','Z'],lines:3},ljspintriple:{pieces:['L','J'],lines:3},ispindouble:{pieces:['I'],lines:2},
+  noclearspin:{lines:0}}[p.id];
+ if(compound){m.event='spin';m.rules.pieces=compound.pieces||[];m.rules.piece=m.rules.pieces.length===1?m.rules.pieces[0]:'';m.rules.facings=compound.facings||[];m.rules.facing=m.rules.facings.length===1?m.rules.facings[0]:'';if(compound.lines!==undefined)m.rules.lines={enabled:true,compare:'exact',count:compound.lines};}
+if(p.exclude&&MODS.includes(p.exclude))m.when.modsNone=[p.exclude];m.requiresAttack=['attack','ljgarbage','szgarbage','receive','received'].includes(p.id);$('tpl').close();append(m)}
+function drawTpl(){const q=tplQuery.trim().toLowerCase();$('tplList').innerHTML=OFFICIAL.map((p,i)=>({p,i,t:`${p.rank}ランク ${templateJa(p,p.target)}`})).filter(x=>!q||x.t.toLowerCase().includes(q)).map(({p,i,t})=>`<button type="button" class="mission" data-tpl="${i}"><span class="rank" data-r="${p.rank}">${p.rank}</span><span>${esc(t)}<small>目標 ${p.target}</small></span></button>`).join('')||'<small>該当なし</small>'}
+function save(){try{const c=exportData(),u=URL.createObjectURL(new Blob([c],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='qp-revive-missions-v5.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);dirty=false;rememberOpened();drawList();status('保存しました')}catch(err){status(err.message,true)}}
+async function openFile(f){try{if(!f)return;if(f.size>1024*1024)throw Error('ファイルが1MBを超えています');importText(await f.text())}catch(err){status('読み込み失敗：'+err.message,true)}}
+
+$('editor').addEventListener('change',ev=>{const el=ev.target,p=el.dataset.p,m=M();if(!p||!m)return;let v=el.type==='checkbox'?el.checked:el.value;
+ if(el.type==='number'){v=Math.min(+el.max,Math.max(+el.min,Math.round(Number(el.value))||+el.min));el.value=v}
+ if(p==='penaltyEvents')v=[...new Set(v.split(',').map(s=>s.trim()).filter(Boolean))];
+ if(p==='event'&&!v)return;setP(m,p,v);if(p==='target')m.count=v;
+ if(p==='event'){if(!v)return;m.timerStart=v==='lines'?'first-clear':'immediate';m.requiresAttack=['attack','ljgarbage','szgarbage'].includes(v);if(v==='pieceheight')m.rules.height.enabled=true;else if(v!=='pieces')m.rules.height.enabled=false}
+ changed(!!el.dataset.re||['event','timeout','effects.boardRotation.enabled','effects.boardRotation.mode','effects.visibility.nextCount','rules.height.enabled','target'].includes(p)&&p!=='target')});
+$('editor').addEventListener('click',ev=>{const t=ev.target.closest('button'),m=M();if(!t||!m)return;const d=t.dataset;
+ if(d.tab){tab=d.tab;drawEditor()}
+ else if(d.seg){m.rankMode=d.seg==='AUTO'?'auto':'fixed';m.rank=d.seg==='AUTO'?null:d.seg;changed(true)}
+ else if(d.pick){const list=getP(m,d.pick)||[],x=d.pick==='rules.facings'?Number(d.v):d.v;setP(m,d.pick,list.includes(x)?list.filter(item=>item!==x):[...list,x]);
+   if(d.pick==='rules.pieces')m.rules.piece=m.rules.pieces.length===1?m.rules.pieces[0]:'';
+   if(d.pick==='rules.facings')m.rules.facing=m.rules.facings.length===1?m.rules.facings[0]:'';
+   changed(true)}
+ else if(d.chip){const on=getP(m,d.chip)||[],old=[...on],v=d.v,twin=v.endsWith('_reversed')?v.replace('_reversed',''):v+'_reversed';const next=on.includes(v)?on.filter(x=>x!==v):[...on.filter(x=>x!==twin),v];setP(m,d.chip,next);
+  if(d.chip==='mods'){m.mod=next[0]||'';if(JSON.stringify(old)===JSON.stringify(m.modLabels))m.modLabels=[...next]}changed(true)}
+ else if(d.nh){const x=Number(d.nh),h=m.effects.visibility.nextHidden||[];m.effects.visibility.nextHidden=(h.includes(x)?h.filter(k=>k!==x):[...h,x]).sort();if(!h.includes(x))m.effects.visibility.next=true;changed(true)}
+ else if(d.ns){const x=Number(d.ns),h=m.effects.visibility.nextWhenSpawnSlots||[];m.effects.visibility.nextWhenSpawnSlots=(h.includes(x)?h.filter(k=>k!==x):[...h,x]).sort();changed(true)}
+ else if(t.id==='dup'){const x=clone(m);x.id+='_'+Date.now();x.name=m.name+' (copy)';append(x)}
+ else if(t.id==='del'){const i=selected,gone=data.missions.splice(i,1)[0];selected=Math.max(0,Math.min(i,data.missions.length-1));dirty=true;changed(true);status('削除しました',false,['元に戻す',()=>{data.missions.splice(i,0,gone);selected=i;changed(true)}])}});
+$('list').addEventListener('click',ev=>{const b=ev.target.closest('[data-i]');if(b){selected=Number(b.dataset.i);redraw();if(innerWidth<=820)$('editor').scrollIntoView({behavior:'smooth'})}});
+$('filters').addEventListener('click',ev=>{const b=ev.target.closest('[data-f]');if(b){filter=b.dataset.f;drawList()}});
+$('testSequence').addEventListener('change',ev=>{const s=ev.target;if(s.dataset.fixed!==undefined){data.testSequence[Number(s.dataset.fixed)]=s.value;changed(false)}});
+$('q').oninput=e=>{query=e.target.value;drawList()};$('listOrder').onchange=e=>{sortMode=e.target.value;drawList()};
+$('add').onclick=()=>append(fresh(['','pieces',6,0,null,'New Mission','custom_new_'+Date.now()]));
+$('addTpl').onclick=()=>{tplQuery='';$('tplQ').value='';drawTpl();$('tpl').showModal()};$('tplClose').onclick=()=>$('tpl').close();
+$('tplQ').oninput=e=>{tplQuery=e.target.value;drawTpl()};$('tplList').onclick=ev=>{const b=ev.target.closest('[data-tpl]');if(b)addTemplate(Number(b.dataset.tpl))};
+$('random').onclick=()=>{const pick=a=>a[Math.floor(Math.random()*a.length)],event=pick(EVENTS),t=OFFICIAL.find(o=>o.id===event),mod=pick(MODS),target=t?.target||pick([2,3,4,6,8]);append({...fresh([mod,event,target,0,pick(['E','D','C','B','A']),`Custom: ${event} ${target}`,'custom_random_'+Date.now()]),requiresAttack:['attack','ljgarbage','szgarbage'].includes(event)})};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());status('コピーしました')}catch(err){status('コピーできませんでした：'+err.message,true)}};
+$('download').onclick=save;$('chooseFile').onclick=()=>$('file').click();$('file').onchange=async e=>{await openFile(e.target.files[0]);e.target.value=''};
+$('loadText').onclick=()=>{try{importText($('json').value)}catch(err){status('読み込み失敗：'+err.message,true)}};$('nameView').onchange=setLang;
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();save()}});
+addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('on')});addEventListener('dragleave',e=>{if(!e.relatedTarget)$('drop').classList.remove('on')});
+addEventListener('drop',async e=>{e.preventDefault();$('drop').classList.remove('on');await openFile(e.dataTransfer.files[0])});
+redraw();
+try{
+ const draft=localStorage.getItem(DRAFT),previous=localStorage.getItem(LAST_OPENED);
+ if(draft){
+  importData(JSON.parse(draft));dirty=true;drawList();
+  status('前回の編集中データを復元しました',false,['保存時の状態に戻す',()=>{try{localStorage.removeItem(DRAFT)}catch{}location.reload()}]);
+ }else if(previous){
+  importData(JSON.parse(previous));dirty=false;drawList();status('前回開いたデータを復元しました');
+ }
+}catch(err){status('保存済みデータの復元に失敗しました：'+err.message,true)}
+</script></body></html>
