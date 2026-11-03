@@ -2,6 +2,21 @@
 <html>
 <head>
 	<base href="https://tetr.io/">
+<script>
+// Blob documents inherit the TETR.IO origin, but browsers still reject a
+// cross-scheme history URL. Keep the current Blob URL when the stock client
+// clears its hash during startup; every other history call remains native.
+if(location.protocol==='blob:'){
+ const nativeReplaceState=history.replaceState.bind(history);
+ history.replaceState=(state,title,url)=>{
+  try{return nativeReplaceState(state,title,url)}
+  catch(error){
+   if(error?.name==='SecurityError')return nativeReplaceState(state,title);
+   throw error;
+  }
+ };
+}
+</script>
 	<title>TETR.IO — OFFLINE BOOKMARKLET v4.8213</title>
 	<link rel="stylesheet" type="text/css" href="/css/tetrio.css?hv=9628c0bbd.a0cb57db6fb1.20260921T164842">
 	<link rel="icon" type="image/x-icon" id="favicon" href="/res/favicon.ico">
